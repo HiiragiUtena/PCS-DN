@@ -5,7 +5,7 @@ from torch import nn
 from transformers import get_linear_schedule_with_warmup
 from torch.optim import AdamW, Adam
 import json
-from model import AdaptermodelClassifier
+from model import PCSDN
 from utils import ErcTextDataset, get_num_classes, compute_metrics, set_seed, get_label_VAD, convert_label_to_VAD, compute_predicts
 import math
 import argparse
@@ -65,7 +65,7 @@ def log_message(message, log_file):
 
 
 def train_model_vad(DATASET, epoch, model, dict_opt, scheduler, loss_function, mode, data, batch_size, cuda, label_VAD, alpha, scaler):
-    # The training function for AdaptermodelClassifier.
+    # The training function for PCSDN.
     random.shuffle(data)
     #crossentropy_loss = nn.CrossEntropyLoss()
     if mode == 'train':
@@ -232,7 +232,7 @@ def main(CUDA: bool, LR: float, SEED: int, DATASET: str, BATCH_SIZE: int, model_
     dev_data = ds_val.inputs_
     test_data = ds_test.inputs_
 
-    model = AdaptermodelClassifier(kwargs, NUM_CLASS)
+    model = PCSDN(kwargs, NUM_CLASS)
     
     '''为不同模块设置不同的优化器''' 
     # DVAE
