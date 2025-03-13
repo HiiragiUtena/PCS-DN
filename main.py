@@ -5,7 +5,7 @@ from torch import nn
 from transformers import get_linear_schedule_with_warmup
 from torch.optim import AdamW, Adam
 import json
-from model import AdapterSCCLClassifier
+from model import AdaptermodelClassifier
 from utils import ErcTextDataset, get_num_classes, compute_metrics, set_seed, get_label_VAD, convert_label_to_VAD, compute_predicts
 import math
 import argparse
@@ -64,8 +64,8 @@ def log_message(message, log_file):
         f.write(message + '\n')
 
 
-def train_SCCL_vad(DATASET, epoch, model, dict_opt, scheduler, loss_function, mode, data, batch_size, cuda, label_VAD, alpha, scaler):
-    # The training function for AdapterSCCLClassifier.
+def train_model_vad(DATASET, epoch, model, dict_opt, scheduler, loss_function, mode, data, batch_size, cuda, label_VAD, alpha, scaler):
+    # The training function for AdaptermodelClassifier.
     random.shuffle(data)
     #crossentropy_loss = nn.CrossEntropyLoss()
     if mode == 'train':
@@ -232,7 +232,7 @@ def main(CUDA: bool, LR: float, SEED: int, DATASET: str, BATCH_SIZE: int, model_
     dev_data = ds_val.inputs_
     test_data = ds_test.inputs_
 
-    model = AdapterSCCLClassifier(kwargs, NUM_CLASS)
+    model = AdaptermodelClassifier(kwargs, NUM_CLASS)
     
     '''为不同模块设置不同的优化器''' 
     # DVAE
@@ -284,11 +284,11 @@ def main(CUDA: bool, LR: float, SEED: int, DATASET: str, BATCH_SIZE: int, model_
     bset_model_cm = None
     
     for n in range(NUM_TRAIN_EPOCHS):
-        train_SCCL_vad(DATASET, n, model, dict_opt, scheduler, loss_function, "train", tr_data, BATCH_SIZE, CUDA, label_VAD,
+        train_model_vad(DATASET, n, model, dict_opt, scheduler, loss_function, "train", tr_data, BATCH_SIZE, CUDA, label_VAD,
                   args['alpha'], scaler)
-        val_w_f1, val_macro_f1, val_micro_f1, val_avg_loss, val_avg_acc, _ = train_SCCL_vad(DATASET, n, model, dict_opt, scheduler, loss_function, "dev", dev_data, 1, CUDA,
+        val_w_f1, val_macro_f1, val_micro_f1, val_avg_loss, val_avg_acc, _ = train_model_vad(DATASET, n, model, dict_opt, scheduler, loss_function, "dev", dev_data, 1, CUDA,
                   label_VAD, args['alpha'], scaler)
-        test_w_f1, test_macro_f1, test_micro_f1, test_avg_loss, test_avg_acc, test_cm = train_SCCL_vad(DATASET, n, model, dict_opt, scheduler, loss_function, "test", test_data, 1, CUDA,
+        test_w_f1, test_macro_f1, test_micro_f1, test_avg_loss, test_avg_acc, test_cm = train_model_vad(DATASET, n, model, dict_opt, scheduler, loss_function, "test", test_data, 1, CUDA,
                   label_VAD, args['alpha'], scaler)
         
         log_message(f"Epoch {n}: Test Loss: {test_avg_loss}, Test weight F1: {test_w_f1}, Test micro F1: {test_micro_f1}", log_file)
