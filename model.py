@@ -1,5 +1,5 @@
 import torch
-from torch import nn
+from torch import nnf
 import numpy as np
 from transformers import RobertaTokenizer, RobertaModel, RobertaConfig
 from pytorch_transformers.my_modeling_roberta import RobertaModelwithAdapter
@@ -12,13 +12,13 @@ from config_args import parse_args
 
 
 
-class AdapterSCCLClassifier(nn.Module):
+class PSCDN(nn.Module):
     """
     Supervised cluster-level contrastive learning which computes cluster-level VAD for each emotion and
     contrast with the emotion prototypes.
     """
     def __init__(self, args, num_class):
-        super(AdapterSCCLClassifier, self).__init__()
+        super(PSCDN, self).__init__()
         # 加载本地模型
         self.bert = RobertaModel.from_pretrained("roberta-large")
         self.tokenizer = RobertaTokenizer.from_pretrained("roberta-large")
